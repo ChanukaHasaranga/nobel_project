@@ -1,11 +1,12 @@
 # nobel_project
 
 A new Flutter project.
+Backend Springboot
+Database Mysql
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
+This project base on Nobel Batch Collecting Its like a Game and this is a one Page of a App Coin Collecting App and also this backend is Springboot and Database is Mysql  
 A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
