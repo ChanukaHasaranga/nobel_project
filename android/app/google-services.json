@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "235006107608",
+    "project_id": "nobelproject-c9cc5",
+    "storage_bucket": "nobelproject-c9cc5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235006107608:android:6d29012b4b960cafd61cad",
+        "android_client_info": {
+          "package_name": "com.example.nobel_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc-mcnAGJrP9yVn2d8gYV1Ul0zTXtNg78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
