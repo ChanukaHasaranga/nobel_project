@@ -15,6 +15,8 @@ class RankingPage extends StatefulWidget {
 class _RankingPageState extends State<RankingPage> {
   final StreamController<List<databases>> _streamController = StreamController.broadcast();
   List<databases> _databasesList = [];
+  String? topItemName;
+  int? topItemCount;
   Timer? _timer;
 
   @override
@@ -36,8 +38,19 @@ class _RankingPageState extends State<RankingPage> {
   void _fetchData() async {
     List<databases> data = await DatabaseServices.getdata();
     data.sort((a, b) => b.count.compareTo(a.count)); // Sort by count
-    _databasesList = data;
+    setState(() {
+      _databasesList = data;
+    });
     _streamController.add(_databasesList);
+  }
+
+  void _handleCountdownEnd() {
+    if (_databasesList.isNotEmpty) {
+      setState(() {
+        topItemName = _databasesList[0].name;
+        topItemCount = _databasesList[0].count;
+      });
+    }
   }
 
   @override
@@ -94,18 +107,26 @@ class _RankingPageState extends State<RankingPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
-                            child: CountdownScreen(),
-                                                       width: double.infinity,
+                            child: CountdownScreen(onCountdownEnd: _handleCountdownEnd),
+                            width: double.infinity,
                             height: height / 10,
                             decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 240, 240, 240),
                                 borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))
-                                ) 
+                            ),
                           ),
+                          if (topItemName != null && topItemCount != null) ...[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Top Item: $topItemName, Count: $topItemCount',
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                           Container(
                             width: double.infinity,
                             height: height / 1.5,
-
                             child: ListView.builder(
                               itemCount: databasesList.length,
                               itemBuilder: (context, index) {
@@ -144,32 +165,11 @@ class _RankingPageState extends State<RankingPage> {
 
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: height / 140),
-                                  child:rankingcontainer(
+                                  child: rankingcontainer(
                                     name: databasesList[index].name, 
-                                    nobelcount:databasesList[index].count.toString(), 
+                                    nobelcount: databasesList[index].count.toString(), 
                                     leadingget: leadingWidget,
-
-                                  )
-                                  //
-                                  // ListTile(
-                                  //   leading: SizedBox(
-                                  //     width: 40,
-                                  //     child: leadingWidget,
-                                  //   ),
-                                  //   title: Text(
-                                  //     databasesList[index].name,
-                                  //     style: TextStyle(
-                                  //         fontSize: width / 25,
-                                  //         color: Colors.black,
-                                  //         fontWeight: FontWeight.bold),
-                                  //   ),
-                                  //   trailing: Text(
-                                  //     databasesList[index].count.toString(),
-                                  //     style: TextStyle(
-                                  //         color: Colors.grey,
-                                  //         fontSize: width / 30),
-                                  //   ),
-                                  // ),
+                                  ),
                                 );
                               },
                             ),

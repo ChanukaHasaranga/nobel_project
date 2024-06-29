@@ -1,36 +1,32 @@
-class databases{
-final int id;
-final String name;
-final String address;
-final int count;
-bool done;
+// 
+class databases {
+  final int id;
+  final String name;
+  final String address;
+  final int count;
+  final String? newDate; // Allow null values for the newDate
+  bool done;
 
-databases({
+  databases({
+    required this.id,
+    required this.name,
+    required this.address,
+    required this.count,
+    this.newDate, // Allow null values for the newDate
+    this.done = false,
+  });
 
-required this.id,
-required this.name,
-required this.address,
-required this.count,
-this.done=false,
+  factory databases.fromMap(Map<String, dynamic> databasesMap) {
+    return databases(
+      id: databasesMap['id'],
+      name: databasesMap['name'],
+      address: databasesMap['address'],
+      count: databasesMap['count'],
+      newDate: databasesMap['newDate'] ?? 'Unknown', // Provide a default value if null
+    );
+  }
 
-});
-
-factory databases.fromMap(Map<String, dynamic> databasesMap){
-
-return databases(
-  id: databasesMap['id'], 
-  name: databasesMap['name'], 
-  address: databasesMap['address'],
-  count:databasesMap['count']
-  
-  );
-
-
-
-}
-
-void toggle(){
-  done=!done;
-}
-
+  void toggle() {
+    done = !done;
+  }
 }

@@ -41,20 +41,13 @@ class _rankingcontainerState extends State<rankingcontainer> {
               child: Row(
                 children: [
                   widget.leadingget,
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder:(context) {
-                        return CountdownScreen();
-                      },));
-                    },
-                    child: Container(
-                      width: width / 6,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: AssetImage("assetss/Resizers/User.jpg"),
-                              fit: BoxFit.contain)),
-                    ),
+                  Container(
+                    width: width / 6,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: AssetImage("assetss/Resizers/User.jpg"),
+                            fit: BoxFit.contain)),
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: height/25,left: width/40),
