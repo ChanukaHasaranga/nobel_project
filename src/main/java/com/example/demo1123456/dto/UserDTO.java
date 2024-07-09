@@ -1,27 +1,24 @@
 package com.example.demo1123456.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-
 public class UserDTO {
+    private int id;
+    private int giftSendCount;
 
-    public int id;
-    public String name;
-    public String address;
-    public int count;
-//private int id;
-//    private String name;
-//    private String address;
-//    private int count;
-//    private int year;
-//    private int month;
-//    private int day;
-//    private String newDate;
+    // Getters and Setters
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getGiftSendCount() {
+        return giftSendCount;
+    }
+
+    public void setGiftSendCount(int giftSendCount) {
+        this.giftSendCount = giftSendCount;
+    }
 }
