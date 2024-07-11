@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nobel_project/Service/database_services.dart';
+import 'package:nobel_project/Service/userdata.dart';
+import 'package:nobel_project/Service/userservice.dart';
 import 'package:nobel_project/countdown.dart';
 import 'package:nobel_project/models/database.dart';
 import 'package:nobel_project/rankincontainer.dart';
@@ -15,6 +17,7 @@ class RankingPage extends StatefulWidget {
 class _RankingPageState extends State<RankingPage> {
   final StreamController<List<databases>> _streamController = StreamController.broadcast();
   List<databases> _databasesList = [];
+  List<User> _userList = []; // Add this line
   String? topItemName;
   int? topItemCount;
   Timer? _timer;
@@ -35,11 +38,13 @@ class _RankingPageState extends State<RankingPage> {
     });
   }
 
-  void _fetchData() async {
+  Future<void> _fetchData() async {
     List<databases> data = await DatabaseServices.getdata();
+    List<User> users = await UserService(baseUrl: 'http://45.126.125.172:8080/api/v1').getUsers(); // Add this line
     data.sort((a, b) => b.count.compareTo(a.count)); // Sort by count
     setState(() {
       _databasesList = data;
+      _userList = users; // Add this line
     });
     _streamController.add(_databasesList);
   }
@@ -47,10 +52,14 @@ class _RankingPageState extends State<RankingPage> {
   void _handleCountdownEnd() {
     if (_databasesList.isNotEmpty) {
       setState(() {
-        topItemName = _databasesList[0].name;
-        topItemCount = _databasesList[0].count;
+        topItemCount = _databasesList[1].count;
+        topItemName = _getUserNameById(_databasesList[1].id); // Add this line
       });
     }
+  }
+
+  String? _getUserNameById(int id) {
+    return _userList.firstWhere((user) => user.id == id, orElse: () => User(id: id, phoneNumber: '')).name;
   }
 
   @override
@@ -130,29 +139,26 @@ class _RankingPageState extends State<RankingPage> {
                             child: ListView.builder(
                               itemCount: databasesList.length,
                               itemBuilder: (context, index) {
-                                String address = databasesList[index].address;
-                                bool validUrl =
-                                    Uri.tryParse(address)?.hasAbsolutePath ?? false;
                                 Widget leadingWidget;
 
                                 if (index == 0) {
                                   leadingWidget = Image.asset(
                                     'assetss/Resizers/firstplace.png',
-                                    scale: width/50,
+                                    scale: width / 50,
                                   );
                                 } else if (index == 1) {
                                   leadingWidget = Image.asset(
                                     'assetss/Resizers/secondplace.png',
-                                    scale: width/50,
+                                    scale: width / 50,
                                   );
                                 } else if (index == 2) {
                                   leadingWidget = Image.asset(
                                     'assetss/Resizers/thirdplace.png',
-                                    scale: width/50,
+                                    scale: width / 50,
                                   );
                                 } else {
                                   leadingWidget = Padding(
-                                    padding:  EdgeInsets.only(left: width/25,right: width/25),
+                                    padding: EdgeInsets.only(left: width / 25, right: width / 25),
                                     child: Text(
                                       '${index + 1}',
                                       style: TextStyle(
@@ -166,8 +172,8 @@ class _RankingPageState extends State<RankingPage> {
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: height / 140),
                                   child: rankingcontainer(
-                                    name: databasesList[index].name, 
-                                    nobelcount: databasesList[index].count.toString(), 
+                                    name: _getUserNameById(databasesList[index].id), // Add this line
+                                    nobelcount: databasesList[index].count.toString(),
                                     leadingget: leadingWidget,
                                   ),
                                 );

@@ -5,6 +5,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:nobel_project/Service/database_services.dart';
 import 'package:nobel_project/Service/globals.dart';
+import 'package:nobel_project/Service/userdata.dart';
+import 'package:nobel_project/Service/userservice.dart';
 import 'package:nobel_project/models/database.dart';
 import 'package:nobel_project/models/database_data.dart';
 import 'package:nobel_project/nobelcart.dart';
@@ -23,6 +25,10 @@ class profilepage extends StatefulWidget {
 
 class _profilepageState extends State<profilepage> {
   List<databases>? Databases;
+  late UserService _userService;
+  late Future<User> _futureUser;
+int databaseid=2;
+
   String profile = '';
   String profilepic = '';
   double nobelcount = 00;
@@ -52,32 +58,31 @@ class _profilepageState extends State<profilepage> {
   Future<double> getNobelCount() async {
     List<databases>? Databases = await DatabaseServices.getdata();
     if (Databases != null && Databases.isNotEmpty && Databases.length >= 2) {
-      return Databases[1].count.toDouble();
+      return Databases[databaseid].count.toDouble();
     } else {
       // Handle the case where databases is null or empty
       return 0.0; // Or any default value you prefer
     }
   }
 
-  Future<String> getname() async {
-    List<databases>? Databases = await DatabaseServices.getdata();
-    if (Databases != null && Databases.isNotEmpty && Databases.length >= 2) {
-      return Databases[1].name.toString();
-    } else {
-      // Handle the case where databases is null or empty
-      return ''; // Or any default value you prefer
-    }
-  }
+  // Future<String> getname() async {
+    // List<User>? userDatabases = await UserService(baseUrl:"http://45.126.125.172:8080/api/v1").getUsers();
+    // if (userDatabases != null && userDatabases.isNotEmpty && userDatabases.length >= 2) {
+      // return userDatabases[2].name.toString();
+    // } else {
+      // return ''; // Or any default value you prefer
+    // }
+  // }
 
-  Future<String> getaddress() async {
-    List<databases>? Databases = await DatabaseServices.getdata();
-    if (Databases != null && Databases.isNotEmpty && Databases.length >= 2) {
-      return Databases[1].address.toString();
-    } else {
+  // Future<String> getaddress() async {
+    // List<databases>? Databases = await DatabaseServices.getdata();
+    // if (Databases != null && Databases.isNotEmpty && Databases.length >= 2) {
+      // return Databases[1].address.toString();
+    // } else {
       // Handle the case where databases is null or empty
-      return ''; // Or any default value you prefer
-    }
-  }
+      // return ''; // Or any default value you prefer
+    // }
+  // }
 
   @override
   void initState() {
@@ -85,16 +90,17 @@ class _profilepageState extends State<profilepage> {
     getdata();
     updateCounted();
     initializeNobelCount();
+   _userService = UserService(baseUrl: 'http://45.126.125.172:8080/api/v1');
+   _futureUser = _userService.getUserById(databaseid); // Fetch user with id = 2  
+    // getname();
   }
 
   void initializeNobelCount() async {
     double count = await getNobelCount();
-    String name = await getname();
-    String address = await getaddress();
+    // String name = await getname();
     setState(() {
       nobelcount = count;
-      profile = name;
-      profilepic = address;
+      // profile=name;
     });
   }
 
@@ -295,568 +301,584 @@ class _profilepageState extends State<profilepage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     getdata();
+    // getname();
     updateCounted();
     initializeNobelCount();
-    getname();
 //nobelcount=(Provider.of<databasedata>(context,listen: false).Databases[0].count).toDouble();
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(nobelback), fit: BoxFit.cover)),
-          child:
-              Consumer<databasedata>(builder: (context, databasedata, child) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-              Expanded(
-                flex: 2,
-                child: Column(
+   return FutureBuilder<User>(
+        future: _futureUser,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return Center(child: Text('User not found'));
+          } else {
+            final user = snapshot.data!;
+    
+    
+        return SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Container(
+              height: height,
+              width: width,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage(nobelback), fit: BoxFit.cover)),
+              child:
+                  Consumer<databasedata>(builder: (context, databasedata, child) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.arrow_back_ios,
-                                color: Colors.black,
-                                size: width / 18,
-                                shadows: [
-                                  BoxShadow(
-                                      blurRadius: 30,
-                                      blurStyle: BlurStyle.outer,
-                                      color:
-                                          const Color.fromARGB(255, 68, 68, 68))
-                                ],
-                              )),
-                          Text(
-                            "MY NOBEL",
-                            style: TextStyle(
-                                color: Colors.white,
-                                shadows: [
-                                  BoxShadow(
-                                      blurRadius: 30,
-                                      color: Colors.black,
-                                      blurStyle: BlurStyle.outer)
-                                ],
-                                fontSize: width / 22,
-                                fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.black,
+                                    size: width / 18,
+                                    shadows: [
+                                      BoxShadow(
+                                          blurRadius: 30,
+                                          blurStyle: BlurStyle.outer,
+                                          color:
+                                              const Color.fromARGB(255, 68, 68, 68))
+                                    ],
+                                  )),
+                              Text(
+                                "MY NOBEL",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    shadows: [
+                                      BoxShadow(
+                                          blurRadius: 30,
+                                          color: Colors.black,
+                                          blurStyle: BlurStyle.outer)
+                                    ],
+                                    fontSize: width / 22,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2),
-                            child: IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) {
-                                      return RankingPage();
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 2),
+                                child: IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) {
+                                          return RankingPage();
+                                        },
+                                      ));
                                     },
-                                  ));
-                                },
-                                icon: Icon(
-                                  FontAwesomeIcons.trophy,
-                                  color: Color.fromARGB(255, 255, 200, 0),
-                                  size: width / 15,
-                                )),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) {
-                                    return question();
+                                    icon: Icon(
+                                      FontAwesomeIcons.trophy,
+                                      color: Color.fromARGB(255, 255, 200, 0),
+                                      size: width / 15,
+                                    )),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) {
+                                        return question();
+                                      },
+                                    ));
                                   },
-                                ));
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.question_mark,
-                                      size: width / 25,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.question_mark,
+                                          size: width / 25,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
+                              )
+                            ],
                           )
                         ],
-                      )
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        left: width / 20, right: width / 20, bottom: height / 40),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage(nobelcon), fit: BoxFit.fill)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: width / 20, right: width / 20, bottom: height / 40),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage(nobelcon), fit: BoxFit.fill)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  Text(
-                                    profile,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        shadows: [
-                                          BoxShadow(
-                                              blurRadius: 20,
-                                              color: Colors.black,
-                                              blurStyle: BlurStyle.outer)
-                                        ],
-                                        fontSize: width / 14,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                            
-                            
-                                ],
-                              ),
-                              //profile image section
-                              if (nobelcount >= 500)...[
-                              SizedBox(
-                                width: width / 3,
-                                child: LottieBuilder.asset(
-                                  frame,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                              ],
-                            
-                              if(nobelcount<500)...[
-                            
-                                SizedBox(
-                                  width: width/3,
-                                  height: height/7,
-                                )
-                            
-                              ]
-                            ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                top: height / 76, bottom: height / 60),
-                            child: Container(
-                              width: double.infinity,
-                              padding:
-                                  EdgeInsets.symmetric(horizontal: width / 30),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                                  Column(
                                     children: [
-                                      Icon(Icons.money,
-                                          color:
-                                              Color.fromARGB(255, 255, 255, 255),
-                                          size: width / 25),
                                       Text(
-                                        "$limit",
+                                        user.name.toString(),
                                         style: TextStyle(
-                                            color: Color.fromARGB(
-                                                255, 255, 255, 255),
-                                            fontSize: width / 25,
+                                            color: Colors.white,
+                                            shadows: [
+                                              BoxShadow(
+                                                  blurRadius: 20,
+                                                  color: Colors.black,
+                                                  blurStyle: BlurStyle.outer)
+                                            ],
+                                            fontSize: width / 14,
                                             fontWeight: FontWeight.bold),
                                       ),
+                                
+                                
                                     ],
                                   ),
+                                  //profile image section
+                                  if (nobelcount >= 500)...[
                                   SizedBox(
-                                    width: width / 100,
-                                  ),
-                                  Row(
+                                    width: width / 3,
+                                    child: LottieBuilder.asset(
+                                      frame,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                  ],
+                                
+                                  if(nobelcount<500)...[
+                                
+                                    SizedBox(
+                                      width: width/3,
+                                      height: height/7,
+                                    )
+                                
+                                  ]
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: height / 76, bottom: height / 60),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: width / 30),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                      Row(
                                         children: [
-                                          SizedBox(
-                                            height: height / 170,
-                                          ),
-                                          Container(
-                                            width: width / 3,
-                                            child: LinearPercentIndicator(
-                                              center: Container(
-                                                  height: height / 72,
-                                                  width: 2,
-                                                  color: const Color.fromARGB(
-                                                      255, 155, 155, 155)),
-                                              lineHeight: height / 70,
-                                              animation: true,
-                                              progressColor: barcolor,
-                                              percent: precentage,
-                                              barRadius: Radius.circular(55),
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 255, 255, 255),
-                                            ),
-                                          ),
-                                          Center(
-                                              child: Text(
-                                            limitline,
+                                          Icon(Icons.money,
+                                              color:
+                                                  Color.fromARGB(255, 255, 255, 255),
+                                              size: width / 25),
+                                          Text(
+                                            "$limit",
                                             style: TextStyle(
-                                                fontSize: width / 36,
                                                 color: Color.fromARGB(
-                                                    255, 252, 252, 252)),
-                                          ))
+                                                    255, 255, 255, 255),
+                                                fontSize: width / 25,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ],
                                       ),
                                       SizedBox(
                                         width: width / 100,
                                       ),
-                                      Text(
-                                        "$endcount",
-                                        style: TextStyle(
-                                            color: Color.fromARGB(
-                                                255, 255, 255, 255),
-                                            fontSize: width / 25,
-                                            fontWeight: FontWeight.bold),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                height: height / 170,
+                                              ),
+                                              Container(
+                                                width: width / 3,
+                                                child: LinearPercentIndicator(
+                                                  center: Container(
+                                                      height: height / 72,
+                                                      width: 2,
+                                                      color: const Color.fromARGB(
+                                                          255, 155, 155, 155)),
+                                                  lineHeight: height / 70,
+                                                  animation: true,
+                                                  progressColor: barcolor,
+                                                  percent: precentage,
+                                                  barRadius: Radius.circular(55),
+                                                  backgroundColor: Color.fromARGB(
+                                                      255, 255, 255, 255),
+                                                ),
+                                              ),
+                                              Center(
+                                                  child: Text(
+                                                limitline,
+                                                style: TextStyle(
+                                                    fontSize: width / 36,
+                                                    color: Color.fromARGB(
+                                                        255, 252, 252, 252)),
+                                              ))
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: width / 100,
+                                          ),
+                                          Text(
+                                            "$endcount",
+                                            style: TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                                fontSize: width / 25,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ), 
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                                
+                      if (limitvalue - nobelcount >= 0 && nobelcount >= 500) ...[
+                        Text(
+                            "Need ${(limitvalue - nobelcount).toString()} to secure your current"
+                            "\n"
+                            "nobel level $nobelname",
+                            style: TextStyle(
+                                fontSize: width / 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                shadows: [BoxShadow(blurRadius: 2)]),
+                            textAlign: TextAlign.center),
+                      ],
+                      if (nobelcount - limitvalue >= 0 && nobelcount >= 500) ...[
+                        Text(
+                            "You'll secure your current nobel level $nobelname after validity period"
+                            "\n"
+                            "To uppgrade to next nobel you need ${(endcount - nobelcount).toString()}",
+                            style: TextStyle(
+                                fontSize: width / 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                shadows: [BoxShadow(blurRadius: 2)]),
+                            textAlign: TextAlign.center)
+                      ],
+                    
+                    ]
+                                ),
+                  ),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: width / 40,
+                                right: width / 40,
+                                ),
+                            child: Container(
+                              child: SingleChildScrollView(
+                                physics: ScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    if ((nobelcount < 500)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Frame.png",
+                                          "assetss/Resizers/Name-Plate.png",
+                                        ],
+                                        name: 'Non-Nobel',
+                                        fcolor: Color.fromARGB(166, 35, 97, 37),
+                                        lcolor: const Color.fromARGB(166, 17, 48, 18),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: ["Frame", "NamePlate"],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
                                       ),
                                     ],
-                                  ), 
-                                ],
+                                    if ((nobelcount <= 1499)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Pawn Frame.png",
+                                          "assetss/Resizers/Pawn Noble Name Plate.PNG",
+                                        ],
+                                        name: 'Pawn',
+                                        fcolor: Color.fromARGB(166, 35, 97, 37),
+                                        lcolor: const Color.fromARGB(166, 17, 48, 18),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Frame",
+                                              "NamePlate",
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 3999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Rook Noble Badge.PNG",
+                                          "assetss/Resizers/Rook Frame.png",
+                                          "assetss/baron.png",
+                                        ],
+                                        name: 'Rook',
+                                        fcolor: Color.fromARGB(166, 21, 100, 165),
+                                        lcolor: Color.fromARGB(166, 13, 64, 105),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 11999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Knight Noble Badge.PNG",
+                                          "assetss/Resizers/Knight Frame.png",
+                                          "assetss/Resizers/Knight Noble Badge Name.PNG",
+                                          "assetss/Resizers/KnightFancyPlate.png",
+                                          "assetss/Resizers/Knightcard.png"
+                                        ],
+                                        name: 'Knight',
+                                        fcolor: Color.fromARGB(166, 116, 29, 132),
+                                        lcolor: Color.fromARGB(166, 74, 18, 84),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 29999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Bishop Noble Badge.PNG",
+                                          "assetss/Resizers/Bishop Frame.png",
+                                          "assetss/Resizers/Bishop Noble Badge Name.PNG",
+                                          "assetss/Resizers/BishopFancyPlate.png",
+                                                                              "assetss/Resizers/Bishopcard.png"
+                      
+                                        ],
+                                        name: 'Bishop',
+                                        fcolor: Color.fromARGB(166, 158, 19, 65),
+                                        lcolor: Color.fromARGB(166, 83, 10, 34),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 59999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Queen-Noble-Badge.PNG",
+                                          "assetss/Resizers/Queen Frame.png",
+                                          "assetss/Resizers/Queen Noble Badge Name.PNG",
+                                          "assetss/Resizers/QueenFancyPlate.png",
+                                                                              "assetss/Resizers/Queencard.png"
+                      
+                                        ],
+                                        name: 'Queen',
+                                        fcolor: Color.fromARGB(166, 110, 66, 1),
+                                        lcolor: Color.fromARGB(166, 55, 33, 0),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 149999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/Duke Noble Badge.PNG",
+                                          "assetss/Resizers/Duke Frame.png",
+                                          "assetss/Resizers/Duke Noble Badge Name.PNG",
+                                          "assetss/Resizers/DukeFancyPlate.png",
+                                                                              "assetss/Resizers/Dukecard.png"
+                      
+                                        ],
+                                        name: 'Duke',
+                                        fcolor: Color.fromARGB(166, 207, 186, 0),
+                                        lcolor: Color.fromARGB(166, 125, 113, 0),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 299999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/King Noble Badge.PNG",
+                                          "assetss/Resizers/King Frame.png",
+                                          "assetss/Resizers/King Noble Badge Name.PNG",
+                                          "assetss/Resizers/KingFancyPlate.png",
+                                                                              "assetss/Resizers/Kingcard.png"
+                      
+                                        ],
+                                        name: 'King',
+                                        fcolor: Color.fromARGB(166, 170, 46, 37),
+                                        lcolor: Color.fromARGB(166, 83, 22, 17),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 449999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/SKing Noble Badge.PNG",
+                                          "assetss/Resizers/SKing Frame.png",
+                                          "assetss/Resizers/SKing Noble Badge Name.PNG",
+                                          "assetss/Resizers/SKingFancyPlate.png",
+                                                                              "assetss/Resizers/SKingcard.png"
+                      
+                                        ],
+                                        name: 'SKing',
+                                        fcolor: Color.fromARGB(166, 65, 1, 61),
+                                        lcolor: Color.fromARGB(166, 23, 0, 21),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: width / 40,
+                                      ),
+                                    ],
+                                    if ((nobelcount <= 1009999)) ...[
+                                      nobelcart(
+                                        img: [
+                                          "assetss/Resizers/SSKing Noble Badge.PNG",
+                                          "assetss/Resizers/SSKing Frame.png",
+                                          "assetss/Resizers/SSKing Noble Badge Name.PNG",
+                                          "assetss/Resizers/SSKingFancyPlate.png",
+                                                                              "assetss/Resizers/SSKingcard.png"
+                      
+                                        ],
+                                        name: 'SSKing',
+                                        fcolor: Color.fromARGB(166, 73, 60, 10),
+                                        lcolor: Color.fromARGB(166, 36, 30, 5),
+                                        nobelpreve: nobelpriveledge,
+                                        nobelbatch: nobelbatch,
+                                        imgname: [
+                                          "Badge",
+                                              "Frame",
+                                          "NamePlate",
+                                          "Entry Effect",
+                                          "Profile Card"
+                                        ],
+                                      ),
+                                    ]
+                                  ],
+                                ),
                               ),
                             ),
                           ),
+                          Container(
+                            width: double.infinity,
+                            height: height / 12,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage(downbar), fit: BoxFit.fill),
+                            ),
+                          )
                         ],
                       ),
                     ),
-                  ),
-                            
-                  if (limitvalue - nobelcount >= 0 && nobelcount >= 500) ...[
-                    Text(
-                        "Need ${(limitvalue - nobelcount).toString()} to secure your current"
-                        "\n"
-                        "nobel level $nobelname",
-                        style: TextStyle(
-                            fontSize: width / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            shadows: [BoxShadow(blurRadius: 2)]),
-                        textAlign: TextAlign.center),
                   ],
-                  if (nobelcount - limitvalue >= 0 && nobelcount >= 500) ...[
-                    Text(
-                        "You'll secure your current nobel level $nobelname after validity period"
-                        "\n"
-                        "To uppgrade to next nobel you need ${(endcount - nobelcount).toString()}",
-                        style: TextStyle(
-                            fontSize: width / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            shadows: [BoxShadow(blurRadius: 2)]),
-                        textAlign: TextAlign.center)
-                  ],
-                
-                ]
-                            ),
-              ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: width / 40,
-                            right: width / 40,
-                            ),
-                        child: Container(
-                          child: SingleChildScrollView(
-                            physics: ScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                if ((nobelcount < 500)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Frame.png",
-                                      "assetss/Resizers/Name-Plate.png",
-                                    ],
-                                    name: 'Non-Nobel',
-                                    fcolor: Color.fromARGB(166, 35, 97, 37),
-                                    lcolor: const Color.fromARGB(166, 17, 48, 18),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: ["Frame", "NamePlate"],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 1499)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Pawn Frame.png",
-                                      "assetss/Resizers/Pawn Noble Name Plate.PNG",
-                                    ],
-                                    name: 'Pawn',
-                                    fcolor: Color.fromARGB(166, 35, 97, 37),
-                                    lcolor: const Color.fromARGB(166, 17, 48, 18),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Frame",
-                                          "NamePlate",
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 3999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Rook Noble Badge.PNG",
-                                      "assetss/Resizers/Rook Frame.png",
-                                      "assetss/baron.png",
-                                    ],
-                                    name: 'Rook',
-                                    fcolor: Color.fromARGB(166, 21, 100, 165),
-                                    lcolor: Color.fromARGB(166, 13, 64, 105),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 11999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Knight Noble Badge.PNG",
-                                      "assetss/Resizers/Knight Frame.png",
-                                      "assetss/Resizers/Knight Noble Badge Name.PNG",
-                                      "assetss/Resizers/KnightFancyPlate.png",
-                                      "assetss/Resizers/Knightcard.png"
-                                    ],
-                                    name: 'Knight',
-                                    fcolor: Color.fromARGB(166, 116, 29, 132),
-                                    lcolor: Color.fromARGB(166, 74, 18, 84),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 29999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Bishop Noble Badge.PNG",
-                                      "assetss/Resizers/Bishop Frame.png",
-                                      "assetss/Resizers/Bishop Noble Badge Name.PNG",
-                                      "assetss/Resizers/BishopFancyPlate.png",
-                                                                          "assetss/Resizers/Bishopcard.png"
-                  
-                                    ],
-                                    name: 'Bishop',
-                                    fcolor: Color.fromARGB(166, 158, 19, 65),
-                                    lcolor: Color.fromARGB(166, 83, 10, 34),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 59999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Queen-Noble-Badge.PNG",
-                                      "assetss/Resizers/Queen Frame.png",
-                                      "assetss/Resizers/Queen Noble Badge Name.PNG",
-                                      "assetss/Resizers/QueenFancyPlate.png",
-                                                                          "assetss/Resizers/Queencard.png"
-                  
-                                    ],
-                                    name: 'Queen',
-                                    fcolor: Color.fromARGB(166, 110, 66, 1),
-                                    lcolor: Color.fromARGB(166, 55, 33, 0),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 149999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/Duke Noble Badge.PNG",
-                                      "assetss/Resizers/Duke Frame.png",
-                                      "assetss/Resizers/Duke Noble Badge Name.PNG",
-                                      "assetss/Resizers/DukeFancyPlate.png",
-                                                                          "assetss/Resizers/Dukecard.png"
-                  
-                                    ],
-                                    name: 'Duke',
-                                    fcolor: Color.fromARGB(166, 207, 186, 0),
-                                    lcolor: Color.fromARGB(166, 125, 113, 0),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 299999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/King Noble Badge.PNG",
-                                      "assetss/Resizers/King Frame.png",
-                                      "assetss/Resizers/King Noble Badge Name.PNG",
-                                      "assetss/Resizers/KingFancyPlate.png",
-                                                                          "assetss/Resizers/Kingcard.png"
-                  
-                                    ],
-                                    name: 'King',
-                                    fcolor: Color.fromARGB(166, 170, 46, 37),
-                                    lcolor: Color.fromARGB(166, 83, 22, 17),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 449999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/SKing Noble Badge.PNG",
-                                      "assetss/Resizers/SKing Frame.png",
-                                      "assetss/Resizers/SKing Noble Badge Name.PNG",
-                                      "assetss/Resizers/SKingFancyPlate.png",
-                                                                          "assetss/Resizers/SKingcard.png"
-                  
-                                    ],
-                                    name: 'SKing',
-                                    fcolor: Color.fromARGB(166, 65, 1, 61),
-                                    lcolor: Color.fromARGB(166, 23, 0, 21),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: width / 40,
-                                  ),
-                                ],
-                                if ((nobelcount <= 1009999)) ...[
-                                  nobelcart(
-                                    img: [
-                                      "assetss/Resizers/SSKing Noble Badge.PNG",
-                                      "assetss/Resizers/SSKing Frame.png",
-                                      "assetss/Resizers/SSKing Noble Badge Name.PNG",
-                                      "assetss/Resizers/SSKingFancyPlate.png",
-                                                                          "assetss/Resizers/SSKingcard.png"
-                  
-                                    ],
-                                    name: 'SSKing',
-                                    fcolor: Color.fromARGB(166, 73, 60, 10),
-                                    lcolor: Color.fromARGB(166, 36, 30, 5),
-                                    nobelpreve: nobelpriveledge,
-                                    nobelbatch: nobelbatch,
-                                    imgname: [
-                                      "Badge",
-                                          "Frame",
-                                      "NamePlate",
-                                      "Entry Effect",
-                                      "Profile Card"
-                                    ],
-                                  ),
-                                ]
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: height / 12,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage(downbar), fit: BoxFit.fill),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
-        ),
-      ),
+                );
+              }),
+            ),
+          ),
+        );
+      }
+        }
     );
   }
 }

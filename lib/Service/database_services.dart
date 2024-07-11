@@ -88,7 +88,7 @@ class DatabaseServices{
     };
 
     var body = json.encode(data);
-    var url = Uri.parse(baseURL + "/saveUser");
+    var url = Uri.parse(baseURL + "/totalGiftCount/2");
 
     http.Response response = await http.post(
       url,
@@ -104,7 +104,7 @@ class DatabaseServices{
   }
 
   static Future<List<databases>> getdata() async {
-    var url = Uri.parse(baseURL + "/getUser");
+    var url = Uri.parse(baseURL + "/all");
     http.Response response = await http.get(
       url,
       headers: header,

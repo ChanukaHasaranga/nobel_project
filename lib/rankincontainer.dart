@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:nobel_project/countdown.dart';
 
 class rankingcontainer extends StatefulWidget {
-  String name;
+  String ? name;
   String nobelcount;
   Widget leadingget;
 
@@ -46,7 +46,7 @@ class _rankingcontainerState extends State<rankingcontainer> {
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                            image: AssetImage("assetss/Resizers/User.jpg"),
+                            image: NetworkImage("assetss/Resizers/User.jpg"),
                             fit: BoxFit.contain)),
                   ),
                   Padding(
@@ -55,7 +55,7 @@ class _rankingcontainerState extends State<rankingcontainer> {
                       height: height / 9,
                       width: width / 4.2,
                       child: Text(
-                        widget.name,
+                        widget.name.toString(),
                         style: TextStyle(
                             fontSize: width / 23,
                             color: Colors.black,
