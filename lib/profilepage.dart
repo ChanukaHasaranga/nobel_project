@@ -85,8 +85,6 @@ class _profilepageState extends State<profilepage> {
     getdata();
     updateCounted();
     initializeNobelCount();
-    getname();
-    getaddress();
   }
 
   void initializeNobelCount() async {
