@@ -17,7 +17,11 @@ import 'package:nobel_project/models/database.dart';
 import 'package:provider/provider.dart';
 
 class profilepage extends StatefulWidget {
-  const profilepage({super.key});
+  int ID;
+   profilepage({
+    
+    required this.ID,
+    super.key});
 
   @override
   State<profilepage> createState() => _profilepageState();
@@ -58,7 +62,7 @@ int databaseid=2;
   Future<double> getNobelCount() async {
     List<databases>? Databases = await DatabaseServices.getdata();
     if (Databases != null && Databases.isNotEmpty && Databases.length >= 2) {
-      return Databases[databaseid].count.toDouble();
+      return Databases[widget.ID].count.toDouble();
     } else {
       // Handle the case where databases is null or empty
       return 0.0; // Or any default value you prefer
@@ -91,7 +95,7 @@ int databaseid=2;
     updateCounted();
     initializeNobelCount();
    _userService = UserService(baseUrl: 'http://45.126.125.172:8080/api/v1');
-   _futureUser = _userService.getUserById(databaseid); // Fetch user with id = 2  
+   _futureUser = _userService.getUserById(widget.ID); // Fetch user with id = 2  
     // getname();
   }
 

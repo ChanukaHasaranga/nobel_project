@@ -15,7 +15,7 @@ class myapp extends StatelessWidget {
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Nobel_Project",
-      home: profilepage(), 
+      home: profilepage(ID: 2,), 
       theme: ThemeData(brightness: Brightness.light),
     )
     );
