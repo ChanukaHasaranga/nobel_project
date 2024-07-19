@@ -1,7 +1,7 @@
 # nobel_project
 
 A new Flutter project.
-Backend Springboot (Master branch)
+Backend Springboot
 Database Mysql
 
 ## Getting Started
